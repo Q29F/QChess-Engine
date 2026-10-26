@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{csrf-token}}">
+    <meta name="description" content="Play and inspect standard chess positions with a local, bounded classical chess engine.">
+    <title>QChess workbench | IDMHYSI systems</title>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/style.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#workbench">Skip to chessboard</a>
+    <header class="site-header"><div class="page-width header-content"><a class="brand" href="/">IDMHYSI <span>systems</span></a><span class="project-label">QChess</span></div></header>
+    <main id="workbench" class="page-width">
+      <section class="intro" aria-labelledby="page-title"><div><p class="eyebrow">Standard chess · local analysis</p><h1 id="page-title">QChess workbench</h1><p class="intro-description">Make a move. Inspect the position. Explore the next line.</p></div><div class="local-note"><span aria-hidden="true"></span><p>Local Python engine<br><strong>Material evaluation · bounded search</strong></p></div></section>
+      <noscript><p class="error-box">Enable JavaScript to play through the local QChess server.</p></noscript>
+      <div id="error" class="error-box" role="alert" hidden></div>
+      <div class="workbench-grid">
+        <section class="board-panel" aria-labelledby="board-heading">
+          <div class="board-heading"><div><p class="section-number">01 / Board</p><h2 id="board-heading">Your next move</h2></div><span class="orientation-note">White at bottom</span></div>
+          <div id="black-player" class="player-row"><span class="player-piece black-token" aria-hidden="true">♟</span><div><strong>Black</strong><span id="black-role">Engine</span></div><span id="black-turn" class="turn-indicator" hidden>To move</span></div>
+          <div id="board" class="chessboard" role="grid" aria-label="Chessboard, White at bottom" aria-describedby="board-help"></div>
+          <div id="white-player" class="player-row"><span class="player-piece white-token" aria-hidden="true">♟</span><div><strong>White</strong><span id="white-role">You</span></div><span id="white-turn" class="turn-indicator" hidden>To move</span></div>
+          <p id="board-help" class="board-help">Select a piece, then a highlighted square. Use arrow keys to move around the board and Enter or Space to select.</p>
+          <div class="board-actions"><button id="undo-move" class="button button-secondary" type="button" disabled>Undo move</button><button id="new-game" class="button button-secondary" type="button" disabled>New game</button><button id="download-pgn" class="button button-secondary" type="button" disabled>Download PGN</button></div>
+          <p class="action-note">Undo removes one played move. After undoing Black’s move, use Engine move to resume.</p>
+        </section>
+        <aside class="analysis-column" aria-label="Game controls and analysis">
+          <section class="panel position-panel" aria-labelledby="position-heading">
+            <div class="panel-heading"><p class="section-number">02 / Position</p><span id="position-badge" class="small-badge">Connecting</span></div>
+            <h2 id="position-heading">Opening the board…</h2>
+            <p id="game-status" class="game-status" role="status" aria-live="polite">Connecting to the local Python process.</p>
+            <div class="evaluation-card"><div><h3 id="evaluation-heading">Position evaluation</h3><p id="evaluation-note">Positive values favor White.</p></div><strong id="evaluation" aria-labelledby="evaluation-heading">—</strong></div>
+            <div class="engine-controls"><label class="checkbox-label"><input id="auto-reply" type="checkbox" checked><span>Automatic Black reply</span></label><p id="mode-help" class="field-help">Play White; Black replies after your move. Turn this off to play either side.</p><div class="engine-row"><div class="depth-field"><label for="depth">Depth</label><select id="depth"><option value="1">1 ply</option><option value="2" selected>2 plies</option><option value="3">3 plies</option><option value="4">4 plies</option></select></div><button id="engine-move" class="button button-primary" type="button" disabled>Engine move<span aria-hidden="true">→</span></button></div><p class="field-help">Engine move plays the current side. Search budget: 50,000 nodes and two seconds; a lower completed depth may be used.</p></div>
+            <div id="last-search" class="search-result" hidden><h3>Last engine search</h3><p id="search-move"></p><dl><div><dt>Score for White</dt><dd id="search-score"></dd></div><div><dt>Search work</dt><dd id="search-work"></dd></div></dl><p id="search-note" class="field-help"></p></div>
+            <div id="draw-panel" class="draw-panel" hidden><h3>A draw can be claimed</h3><label for="draw-choice">Draw claim</label><select id="draw-choice"></select><p id="draw-note" class="field-help"></p><button id="claim-draw" class="button button-secondary" type="button" disabled>Claim draw</button></div>
+          </section>
+          <section class="panel history-panel" aria-labelledby="history-heading"><div class="section-title-row"><h2 id="history-heading">Move history</h2><span id="move-count" class="section-note">0 half-moves</span></div><p id="empty-history" class="empty-history">Played moves will appear here in standard algebraic notation.</p><div id="history-scroll" class="history-scroll" role="region" aria-label="Scrollable move history" tabindex="0"><table class="history-table"><caption>Move history</caption><thead><tr><th scope="col">Move</th><th scope="col">White</th><th scope="col">Black</th></tr></thead><tbody id="history-body"></tbody></table></div></section>
+        </aside>
+      </div>
+      <section class="panel fen-panel" aria-labelledby="fen-heading"><div class="fen-heading"><div><p class="section-number">03 / Position tools</p><h2 id="fen-heading">Continue from a position</h2></div><p>Loading a FEN starts a new history. Earlier repetitions cannot be recovered from FEN alone.</p></div><div class="fen-grid"><div><label for="current-fen">Current FEN</label><textarea id="current-fen" class="fen-text" rows="3" readonly spellcheck="false" aria-describedby="current-fen-help"></textarea><p id="current-fen-help" class="field-help">The complete position currently shown on the board.</p></div><form id="fen-form" novalidate><label for="fen-input">Load FEN</label><textarea id="fen-input" class="fen-text" rows="3" maxlength="160" spellcheck="false" placeholder="Paste a complete six-field FEN" aria-describedby="fen-help"></textarea><div class="fen-action"><p id="fen-help" class="field-help">Standard chess only. Loading replaces the current game.</p><button id="load-position" class="button button-secondary" type="submit" disabled>Load position</button></div></form></div></section>
+      <details class="method-panel"><summary><span>About this engine</span><span class="summary-note">Evaluation, search and draws</span></summary><div class="method-content"><div><h3>Classical chess</h3><p>Moves follow standard chess rules, including castling, en passant and promotion. Positions and full move histories are validated by the local Python process.</p></div><div><h3>Bounded material search</h3><p>The engine uses deterministic alpha-beta search with material values and terminal results. It has no positional model or opening book. Search scores describe the searched line, while the position score reports the board currently shown.</p></div><div><h3>Explicit draw claims</h3><p>Automatic game endings stop play. Available threefold and fifty-move claims appear as concrete choices; an announced move is recorded with the claim and is not played. Games stop at 512 half-moves or the supported FEN counter limit.</p></div></div></details>
+    </main>
+    <footer class="page-width site-footer"><span>IDMHYSI systems <span aria-hidden="true">/</span> QChess</span><p>Local processing. Games remain in this page unless you download PGN.</p></footer>
+    <dialog id="promotion-dialog" aria-labelledby="promotion-heading" aria-describedby="promotion-description"><h2 id="promotion-heading">Choose promotion</h2><p id="promotion-description">Choose the piece for your pawn.</p><div class="promotion-options"><button class="promotion-option" type="button" data-promotion="q" aria-label="Promote to queen"><span aria-hidden="true">♛</span>Queen</button><button class="promotion-option" type="button" data-promotion="r" aria-label="Promote to rook"><span aria-hidden="true">♜</span>Rook</button><button class="promotion-option" type="button" data-promotion="b" aria-label="Promote to bishop"><span aria-hidden="true">♝</span>Bishop</button><button class="promotion-option" type="button" data-promotion="n" aria-label="Promote to knight"><span aria-hidden="true">♞</span>Knight</button></div><button id="cancel-promotion" class="button button-secondary" type="button">Cancel promotion</button></dialog>
+  </body>
+</html>

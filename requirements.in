@@ -1,0 +1,2 @@
+# Direct rules dependency; all engine/search/protocol code uses the standard library.
+chess==1.11.2

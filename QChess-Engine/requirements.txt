@@ -1,7 +1,0 @@
-# Required Python packages for the QChess Engine project
-
-numpy==1.21.0
-scipy==1.7.0
-python-chess==1.9.0
-matplotlib==3.4.3
-pytest==6.2.4
